@@ -1,20 +1,16 @@
 
 import { useState } from "react";
-import { pragas as todasPragas, Praga } from "@/data/pragas";
 import IconePraga from "./IconePraga";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { usePragas } from "@/contexts/PragasContext";
 
 const IconEditor = () => {
-  const [pragas, setPragas] = useState<Praga[]>(todasPragas);
+  const { pragas, atualizarPraga } = usePragas();
   const [editMode, setEditMode] = useState(false);
   
   const handleIconUpdate = (pragaId: string, novoIcone: string) => {
-    setPragas(prevPragas => 
-      prevPragas.map(praga => 
-        praga.id === pragaId ? { ...praga, icone: novoIcone } : praga
-      )
-    );
+    atualizarPraga(pragaId, { icone: novoIcone });
     toast.success("Ícone atualizado com sucesso");
   };
   
@@ -46,11 +42,7 @@ const IconEditor = () => {
           const resizedImageUrl = canvas.toDataURL("image/png");
           
           // Atualizar o estado
-          setPragas(prevPragas => 
-            prevPragas.map(praga => 
-              praga.id === pragaId ? { ...praga, imagemUrl: resizedImageUrl } : praga
-            )
-          );
+          atualizarPraga(pragaId, { imagemUrl: resizedImageUrl });
           
           toast.success("Imagem carregada com sucesso");
         }

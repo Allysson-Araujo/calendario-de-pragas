@@ -1,102 +1,146 @@
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
+
+import React, { useState } from "react";
 import { Praga } from "@/data/pragas";
 import {
-  Bug, Mouse, Bird, Fish, BugOff, Bath, Shell, Rat, Skull, Snail
-} from "lucide-react";
-import { useState } from "react";
-import { Input } from "./ui/input";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 
 interface IconePragaProps {
   praga: Praga;
   incidenciaAlta: boolean;
+  editMode?: boolean;
   onIconUpdate?: (pragaId: string, novoIcone: string) => void;
   onImageUpdate?: (pragaId: string, imageFile: File) => void;
-  editMode?: boolean;
 }
 
-// Mapeamento de IDs para ícones do Lucide
-const iconMap: Record<string, React.ReactNode> = {
-  barata: <Bug className="h-5 w-5" />,
-  cupim: <Bug className="h-5 w-5" />,
-  formiga: <Bug className="h-5 w-5" />,
-  lesma: <Snail className="h-5 w-5" />,
-  pombo: <Bird className="h-5 w-5" />,
-  caruncho: <Bug className="h-5 w-5" />,
-  percevejo: <Bug className="h-5 w-5" />,
-  barbeiro: <Bug className="h-5 w-5" />,
-  escorpiao: <Skull className="h-5 w-5" />,
-  mosca: <Fish className="h-5 w-5" />,
-  mosquito: <Bug className="h-5 w-5" />,
-  pulga: <BugOff className="h-5 w-5" />,
-  rato: <Mouse className="h-5 w-5" />,
-  morcego: <Bath className="h-5 w-5" />,
-  aranha: <Bug className="h-5 w-5" />,
-  carrapato: <Bug className="h-5 w-5" />,
-  traca: <BugOff className="h-5 w-5" />,
-  cascudinho: <Bug className="h-5 w-5" />,
-};
-
-const IconePraga = ({ praga, incidenciaAlta, onIconUpdate, onImageUpdate, editMode = false }: IconePragaProps) => {
-  const [isEditing, setIsEditing] = useState(false);
+const IconePraga = ({
+  praga,
+  incidenciaAlta,
+  editMode = false,
+  onIconUpdate,
+  onImageUpdate,
+}: IconePragaProps) => {
+  const [showDialog, setShowDialog] = useState(false);
   const [novoIcone, setNovoIcone] = useState(praga.icone);
-  
-  const handleDoubleClick = () => {
-    if (editMode) {
-      setIsEditing(true);
+  const [showImageUpload, setShowImageUpload] = useState(false);
+
+  const handleIconClick = () => {
+    if (editMode && onIconUpdate) {
+      setShowDialog(true);
     }
   };
 
   const handleSave = () => {
     if (onIconUpdate) {
       onIconUpdate(praga.id, novoIcone);
-    }
-    setIsEditing(false);
-  };
-  
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0] && onImageUpdate) {
-      onImageUpdate(praga.id, e.target.files[0]);
-      setIsEditing(false);
+      setShowDialog(false);
     }
   };
 
-  if (isEditing) {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && onImageUpdate) {
+      onImageUpdate(praga.id, file);
+      setShowImageUpload(false);
+    }
+  };
+
+  const tooltipText = incidenciaAlta
+    ? `${praga.nome} - Alta incidência`
+    : `${praga.nome} - Incidência média`;
+
+  // Se estiver em modo de edição, permite ações adicionais
+  if (editMode) {
     return (
-      <div className="flex flex-col items-center space-y-2 p-2 border border-dashed border-gray-300 rounded">
-        <Input
-          type="text"
-          value={novoIcone}
-          onChange={(e) => setNovoIcone(e.target.value)}
-          className="w-16 h-8 text-center"
-          maxLength={2}
-        />
-        
-        <label className="flex flex-col items-center text-xs text-blue-600 cursor-pointer">
-          <span>Enviar imagem</span>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageUpload}
-            className="hidden"
-          />
-        </label>
-        
-        <div className="flex justify-between w-full">
-          <button
-            onClick={() => setIsEditing(false)}
-            className="px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+      <>
+        <div className="flex flex-col items-center">
+          <div
+            onClick={handleIconClick}
+            className={cn(
+              "cursor-pointer p-2 rounded-md border-2 border-dashed border-gray-300 hover:border-blue-500 flex items-center justify-center w-16 h-16",
+              incidenciaAlta ? "praga-alta" : "praga-media"
+            )}
           >
-            ✕
-          </button>
-          <button
-            onClick={handleSave}
-            className="px-2 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600"
-          >
-            ✓
-          </button>
+            {praga.imagemUrl ? (
+              <img
+                src={praga.imagemUrl}
+                alt={praga.nome}
+                className="w-14 h-14 object-contain"
+              />
+            ) : (
+              <span className="text-3xl">{praga.icone}</span>
+            )}
+          </div>
+
+          <div className="mt-1 space-x-1">
+            <button
+              onClick={() => setShowImageUpload(true)}
+              className="text-xs text-blue-500 hover:underline"
+            >
+              Imagem
+            </button>
+            <span className="text-xs text-gray-400">|</span>
+            <button
+              onClick={() => setShowDialog(true)}
+              className="text-xs text-blue-500 hover:underline"
+            >
+              Ícone
+            </button>
+          </div>
         </div>
-      </div>
+
+        {/* Dialog para editar ícone */}
+        <Dialog open={showDialog} onOpenChange={setShowDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Editar Ícone para {praga.nome}</DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              <Input
+                value={novoIcone}
+                onChange={(e) => setNovoIcone(e.target.value)}
+                placeholder="Digite um emoji ou caractere"
+              />
+              <div className="mt-4 text-center">
+                <span className="text-5xl">{novoIcone}</span>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowDialog(false)}>
+                Cancelar
+              </Button>
+              <Button onClick={handleSave}>Salvar</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Dialog para upload de imagem */}
+        <Dialog open={showImageUpload} onOpenChange={setShowImageUpload}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Carregar Imagem para {praga.nome}</DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+              />
+              <p className="text-xs text-gray-500 mt-2">
+                A imagem será redimensionada para 150x150 pixels
+              </p>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </>
     );
   }
 
@@ -104,25 +148,22 @@ const IconePraga = ({ praga, incidenciaAlta, onIconUpdate, onImageUpdate, editMo
     return (
       <TooltipProvider>
         <Tooltip>
-          <TooltipTrigger asChild>
+          <TooltipTrigger>
             <div
               className={cn(
-                "inline-flex items-center justify-center cursor-help",
-                incidenciaAlta ? "praga-alta" : "praga-media",
-                editMode ? "cursor-pointer border border-dashed border-gray-300" : ""
+                "w-10 h-10 flex items-center justify-center",
+                incidenciaAlta ? "praga-alta" : "praga-media"
               )}
-              onDoubleClick={handleDoubleClick}
             >
-              <img 
-                src={praga.imagemUrl} 
+              <img
+                src={praga.imagemUrl}
                 alt={praga.nome}
-                className="w-9 h-9 object-contain" 
+                className="w-8 h-8 object-contain"
               />
             </div>
           </TooltipTrigger>
           <TooltipContent>
-            <p>{praga.nome}</p>
-            {editMode && <p className="text-xs text-gray-500">(Clique duplo para editar)</p>}
+            <p>{tooltipText}</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
@@ -132,21 +173,18 @@ const IconePraga = ({ praga, incidenciaAlta, onIconUpdate, onImageUpdate, editMo
   return (
     <TooltipProvider>
       <Tooltip>
-        <TooltipTrigger asChild>
+        <TooltipTrigger>
           <div
             className={cn(
-              "inline-flex items-center justify-center p-1 cursor-help",
-              incidenciaAlta ? "praga-alta" : "praga-media",
-              editMode ? "cursor-pointer border border-dashed border-gray-300" : ""
+              "text-xl",
+              incidenciaAlta ? "praga-alta" : "praga-media"
             )}
-            onDoubleClick={handleDoubleClick}
           >
-            {iconMap[praga.id] || <span>{praga.icone}</span>}
+            {praga.icone}
           </div>
         </TooltipTrigger>
         <TooltipContent>
-          <p>{praga.nome}</p>
-          {editMode && <p className="text-xs text-gray-500">(Clique duplo para editar)</p>}
+          <p>{tooltipText}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

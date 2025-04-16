@@ -2,6 +2,8 @@
 import { MesCalendario, pragas as todasPragas } from "@/data/pragas";
 import { cn } from "@/lib/utils";
 import IconePraga from "./IconePraga";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import DetalheMes from "./DetalheMes";
 
 interface MesCardProps {
   mes: MesCalendario;
@@ -23,24 +25,32 @@ const MesCard = ({ mes }: MesCardProps) => {
   }).filter(Boolean);
 
   return (
-    <div className="flex flex-col h-full border rounded-md overflow-hidden">
-      <div className={cn("p-2 font-bold text-center relative", `${mes.estacao}-header`)}>
-        <span className="absolute left-2 top-2">{iconesEstacao[mes.estacao]}</span>
-        {mes.nome}
-        <span className="absolute right-2 top-2">{iconesEstacao[mes.estacao]}</span>
-      </div>
-      <div className={cn("flex-1 p-4 grid grid-cols-4 gap-2", mes.estacao)}>
-        {pragasDoMes.map((item, index) => (
-          item && (
-            <IconePraga 
-              key={`${mes.nome}-${item.praga.id}-${index}`} 
-              praga={item.praga} 
-              incidenciaAlta={item.incidenciaAlta} 
-            />
-          )
-        ))}
-      </div>
-    </div>
+    <Sheet>
+      <SheetTrigger className="w-full">
+        <div className="flex flex-col h-full border rounded-md overflow-hidden hover:shadow-md transition-shadow">
+          <div className={cn("p-2 font-bold text-center relative", `${mes.estacao}-header`)}>
+            <span className="absolute left-2 top-2">{iconesEstacao[mes.estacao]}</span>
+            {mes.nome}
+            <span className="absolute right-2 top-2">{iconesEstacao[mes.estacao]}</span>
+          </div>
+          <div className={cn("flex-1 p-4 grid grid-cols-4 gap-2", mes.estacao)}>
+            {pragasDoMes.map((item, index) => (
+              item && (
+                <IconePraga 
+                  key={`${mes.nome}-${item.praga.id}-${index}`} 
+                  praga={item.praga} 
+                  incidenciaAlta={item.incidenciaAlta} 
+                />
+              )
+            ))}
+          </div>
+        </div>
+      </SheetTrigger>
+      
+      <SheetContent className={cn("w-full sm:max-w-md md:max-w-lg", mes.estacao)} side="right">
+        <DetalheMes mes={mes} />
+      </SheetContent>
+    </Sheet>
   );
 };
 
