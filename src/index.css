@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -49,6 +50,15 @@
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* Calendário de pragas - cores */
+    --title-green: 158 67% 22%;
+    --verao: 49 100% 75%;
+    --primavera: 19 100% 67%;
+    --outono: 159 41% 71%;
+    --inverno: 210 100% 27%;
+    --incidencia-alta: 0 79% 58%;
+    --incidencia-media: 0 0% 20%;
   }
 
   .dark {
@@ -98,4 +108,36 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Estilos específicos para o calendário de pragas */
+.verao {
+  @apply bg-amber-200;
+}
+.primavera {
+  @apply bg-orange-200;
+}
+.outono {
+  @apply bg-emerald-100;
+}
+.inverno {
+  @apply bg-sky-200;
+}
+.verao-header {
+  @apply bg-yellow-400 text-white;
+}
+.primavera-header {
+  @apply bg-orange-400 text-white;
+}
+.outono-header {
+  @apply bg-emerald-400 text-white;
+}
+.inverno-header {
+  @apply bg-blue-800 text-white;
+}
+.praga-alta {
+  @apply text-red-600;
+}
+.praga-media {
+  @apply text-slate-800;
 }
