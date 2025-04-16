@@ -100,7 +100,6 @@ const IconePraga = ({ praga, incidenciaAlta, onIconUpdate, onImageUpdate, editMo
     );
   }
 
-  // Render uploaded image if available
   if (praga.imagemUrl) {
     return (
       <TooltipProvider>
@@ -130,7 +129,6 @@ const IconePraga = ({ praga, incidenciaAlta, onIconUpdate, onImageUpdate, editMo
     );
   }
 
-  // Render default icon
   return (
     <TooltipProvider>
       <Tooltip>

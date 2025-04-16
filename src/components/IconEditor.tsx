@@ -1,16 +1,12 @@
 
 import { useState } from "react";
-import { pragas as todasPragas } from "@/data/pragas";
+import { pragas as todasPragas, Praga } from "@/data/pragas";
 import IconePraga from "./IconePraga";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-interface PragaEditavel extends Praga {
-  imagemUrl?: string;
-}
-
 const IconEditor = () => {
-  const [pragas, setPragas] = useState<PragaEditavel[]>(todasPragas);
+  const [pragas, setPragas] = useState<Praga[]>(todasPragas);
   const [editMode, setEditMode] = useState(false);
   
   const handleIconUpdate = (pragaId: string, novoIcone: string) => {

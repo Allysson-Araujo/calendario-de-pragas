@@ -1,8 +1,8 @@
-
 export interface Praga {
   id: string;
   nome: string;
   icone: string;
+  imagemUrl?: string;
 }
 
 export interface IncidenciaPraga {
