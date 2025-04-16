@@ -3,7 +3,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { cn } from "@/lib/utils";
 import { Praga } from "@/data/pragas";
 import {
-  Bug, Ant, Mouse, Bird, Fish, BugOff, Bath, Shell, Rat, Skull, Snail
+  Bug, Mouse, Bird, Fish, BugOff, Bath, Shell, Rat, Skull, Snail
 } from "lucide-react";
 
 interface IconePragaProps {
@@ -15,7 +15,7 @@ interface IconePragaProps {
 const iconMap: Record<string, React.ReactNode> = {
   barata: <Bug className="h-5 w-5" />,
   cupim: <Bug className="h-5 w-5" />,
-  formiga: <Ant className="h-5 w-5" />,
+  formiga: <Bug className="h-5 w-5" />,  // Replaced Ant with Bug
   lesma: <Snail className="h-5 w-5" />,
   pombo: <Bird className="h-5 w-5" />,
   caruncho: <Bug className="h-5 w-5" />,
