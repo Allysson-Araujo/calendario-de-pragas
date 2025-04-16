@@ -5,10 +5,14 @@ import { Praga } from "@/data/pragas";
 import {
   Bug, Mouse, Bird, Fish, BugOff, Bath, Shell, Rat, Skull, Snail
 } from "lucide-react";
+import { useState } from "react";
+import { Input } from "./ui/input";
 
 interface IconePragaProps {
   praga: Praga;
   incidenciaAlta: boolean;
+  onIconUpdate?: (pragaId: string, novoIcone: string) => void;
+  editMode?: boolean;
 }
 
 // Mapeamento de IDs para ícones do Lucide
@@ -33,7 +37,43 @@ const iconMap: Record<string, React.ReactNode> = {
   cascudinho: <Bug className="h-5 w-5" />,
 };
 
-const IconePraga = ({ praga, incidenciaAlta }: IconePragaProps) => {
+const IconePraga = ({ praga, incidenciaAlta, onIconUpdate, editMode = false }: IconePragaProps) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [novoIcone, setNovoIcone] = useState(praga.icone);
+
+  const handleDoubleClick = () => {
+    if (editMode) {
+      setIsEditing(true);
+    }
+  };
+
+  const handleSave = () => {
+    if (onIconUpdate) {
+      onIconUpdate(praga.id, novoIcone);
+    }
+    setIsEditing(false);
+  };
+
+  if (isEditing) {
+    return (
+      <div className="flex items-center space-x-2">
+        <Input
+          type="text"
+          value={novoIcone}
+          onChange={(e) => setNovoIcone(e.target.value)}
+          className="w-16 h-8 text-center"
+          maxLength={2}
+        />
+        <button
+          onClick={handleSave}
+          className="px-2 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600"
+        >
+          ✓
+        </button>
+      </div>
+    );
+  }
+
   return (
     <TooltipProvider>
       <Tooltip>
@@ -41,14 +81,17 @@ const IconePraga = ({ praga, incidenciaAlta }: IconePragaProps) => {
           <div
             className={cn(
               "inline-flex items-center justify-center p-1 cursor-help",
-              incidenciaAlta ? "praga-alta" : "praga-media"
+              incidenciaAlta ? "praga-alta" : "praga-media",
+              editMode ? "cursor-pointer border border-dashed border-gray-300" : ""
             )}
+            onDoubleClick={handleDoubleClick}
           >
             {iconMap[praga.id] || <span>{praga.icone}</span>}
           </div>
         </TooltipTrigger>
         <TooltipContent>
           <p>{praga.nome}</p>
+          {editMode && <p className="text-xs text-gray-500">(Clique duplo para editar)</p>}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
