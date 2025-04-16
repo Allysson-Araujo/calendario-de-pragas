@@ -1,9 +1,10 @@
 
-import { MesCalendario, pragas as todasPragas } from "@/data/pragas";
+import { MesCalendario } from "@/data/pragas";
 import { cn } from "@/lib/utils";
 import IconePraga from "./IconePraga";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import DetalheMes from "./DetalheMes";
+import { usePragas } from "@/contexts/PragasContext";
 
 interface MesCardProps {
   mes: MesCalendario;
@@ -17,9 +18,11 @@ const iconesEstacao: Record<string, string> = {
 };
 
 const MesCard = ({ mes }: MesCardProps) => {
+  const { pragas } = usePragas();
+  
   // Encontrar as pragas para este mês
   const pragasDoMes = mes.pragas.map((item) => {
-    const praga = todasPragas.find(p => p.id === item.pragaId);
+    const praga = pragas.find(p => p.id === item.pragaId);
     if (!praga) return null;
     return { praga, incidenciaAlta: item.incidenciaAlta };
   }).filter(Boolean);

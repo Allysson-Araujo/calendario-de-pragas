@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { usePragas } from "@/contexts/PragasContext";
 
 const IconEditor = () => {
-  const { pragas, atualizarPraga } = usePragas();
+  const { pragas, atualizarPraga, excluirPraga } = usePragas();
   const [editMode, setEditMode] = useState(false);
   
   const handleIconUpdate = (pragaId: string, novoIcone: string) => {
@@ -54,6 +54,11 @@ const IconEditor = () => {
     reader.readAsDataURL(imageFile);
   };
 
+  const handleDeletePraga = (pragaId: string) => {
+    excluirPraga(pragaId);
+    toast.success("Praga excluída com sucesso");
+  };
+
   return (
     <div className="p-4 bg-white rounded-md shadow-sm">
       <div className="flex justify-between items-center mb-4">
@@ -74,6 +79,7 @@ const IconEditor = () => {
               incidenciaAlta={false} 
               onIconUpdate={handleIconUpdate}
               onImageUpdate={handleImageUpdate}
+              onDelete={handleDeletePraga}
               editMode={editMode}
             />
             <span className="text-xs mt-1">{praga.nome}</span>

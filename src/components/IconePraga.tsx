@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { usePragas } from "@/contexts/PragasContext";
+import { X } from "lucide-react";
 
 interface IconePragaProps {
   praga: Praga;
@@ -19,6 +21,9 @@ interface IconePragaProps {
   editMode?: boolean;
   onIconUpdate?: (pragaId: string, novoIcone: string) => void;
   onImageUpdate?: (pragaId: string, imageFile: File) => void;
+  onDelete?: (pragaId: string) => void;
+  mesNome?: string;
+  allowRemoveFromMonth?: boolean;
 }
 
 const IconePraga = ({
@@ -27,10 +32,16 @@ const IconePraga = ({
   editMode = false,
   onIconUpdate,
   onImageUpdate,
+  onDelete,
+  mesNome,
+  allowRemoveFromMonth = false,
 }: IconePragaProps) => {
+  const { atualizarImagemUrl, excluirPraga, removerPragaDoMes } = usePragas();
   const [showDialog, setShowDialog] = useState(false);
   const [novoIcone, setNovoIcone] = useState(praga.icone);
   const [showImageUpload, setShowImageUpload] = useState(false);
+  const [showImageUrlInput, setShowImageUrlInput] = useState(false);
+  const [imageUrl, setImageUrl] = useState(praga.imagemUrl || "");
 
   const handleIconClick = () => {
     if (editMode && onIconUpdate) {
@@ -53,6 +64,27 @@ const IconePraga = ({
     }
   };
 
+  const handleImageUrlSave = () => {
+    if (imageUrl.trim()) {
+      atualizarImagemUrl(praga.id, imageUrl);
+      setShowImageUrlInput(false);
+    }
+  };
+
+  const handleDelete = () => {
+    if (onDelete) {
+      onDelete(praga.id);
+    } else {
+      excluirPraga(praga.id);
+    }
+  };
+
+  const handleRemoveFromMonth = () => {
+    if (mesNome) {
+      removerPragaDoMes(mesNome, praga.id);
+    }
+  };
+
   const tooltipText = incidenciaAlta
     ? `${praga.nome} - Alta incidência`
     : `${praga.nome} - Incidência média`;
@@ -61,7 +93,7 @@ const IconePraga = ({
   if (editMode) {
     return (
       <>
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center relative">
           <div
             onClick={handleIconClick}
             className={cn(
@@ -85,7 +117,14 @@ const IconePraga = ({
               onClick={() => setShowImageUpload(true)}
               className="text-xs text-blue-500 hover:underline"
             >
-              Imagem
+              Upload
+            </button>
+            <span className="text-xs text-gray-400">|</span>
+            <button
+              onClick={() => setShowImageUrlInput(true)}
+              className="text-xs text-blue-500 hover:underline"
+            >
+              URL
             </button>
             <span className="text-xs text-gray-400">|</span>
             <button
@@ -93,6 +132,13 @@ const IconePraga = ({
               className="text-xs text-blue-500 hover:underline"
             >
               Ícone
+            </button>
+            <span className="text-xs text-gray-400">|</span>
+            <button
+              onClick={handleDelete}
+              className="text-xs text-red-500 hover:underline"
+            >
+              Excluir
             </button>
           </div>
         </div>
@@ -140,33 +186,44 @@ const IconePraga = ({
             </div>
           </DialogContent>
         </Dialog>
-      </>
-    );
-  }
 
-  if (praga.imagemUrl) {
-    return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger>
-            <div
-              className={cn(
-                "w-10 h-10 flex items-center justify-center",
-                incidenciaAlta ? "praga-alta" : "praga-media"
-              )}
-            >
-              <img
-                src={praga.imagemUrl}
-                alt={praga.nome}
-                className="w-8 h-8 object-contain"
+        {/* Dialog para input de URL de imagem */}
+        <Dialog open={showImageUrlInput} onOpenChange={setShowImageUrlInput}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>URL da Imagem para {praga.nome}</DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              <Input
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                placeholder="Cole a URL da imagem aqui"
               />
+              {imageUrl && (
+                <div className="mt-4 text-center">
+                  <img
+                    src={imageUrl}
+                    alt="Preview"
+                    className="max-w-full h-auto max-h-32 mx-auto"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "https://placehold.co/150x150/eee/ccc?text=Erro";
+                    }}
+                  />
+                </div>
+              )}
+              <p className="text-xs text-gray-500 mt-2">
+                Recomendado: imagem de 150x150 pixels
+              </p>
             </div>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{tooltipText}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowImageUrlInput(false)}>
+                Cancelar
+              </Button>
+              <Button onClick={handleImageUrlSave}>Salvar</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </>
     );
   }
 
@@ -174,13 +231,35 @@ const IconePraga = ({
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger>
-          <div
-            className={cn(
-              "text-xl",
-              incidenciaAlta ? "praga-alta" : "praga-media"
+          <div className="relative">
+            <div
+              className={cn(
+                "w-10 h-10 flex items-center justify-center",
+                incidenciaAlta ? "praga-alta" : "praga-media"
+              )}
+            >
+              {praga.imagemUrl ? (
+                <img
+                  src={praga.imagemUrl}
+                  alt={praga.nome}
+                  className="w-8 h-8 object-contain"
+                />
+              ) : (
+                <span className="text-xl">{praga.icone}</span>
+              )}
+            </div>
+            
+            {allowRemoveFromMonth && mesNome && (
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleRemoveFromMonth();
+                }}
+                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs hover:bg-red-600"
+              >
+                <X size={12} />
+              </button>
             )}
-          >
-            {praga.icone}
           </div>
         </TooltipTrigger>
         <TooltipContent>
