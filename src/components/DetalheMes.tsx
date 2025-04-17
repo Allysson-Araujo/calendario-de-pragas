@@ -53,10 +53,7 @@ const DetalheMes = ({ mes }: DetalheMesProps) => {
           {pragasDoMes.map((item, index) => (
             item && (
               <div key={`detalhe-${mes.nome}-${item.praga.id}-${index}`} 
-                className={cn(
-                  "flex flex-col items-center p-3 border rounded-md",
-                  item.incidenciaAlta ? "border-red-400 bg-red-50" : "border-gray-300 bg-gray-50"
-                )}
+                className="flex flex-col items-center py-2"
               >
                 <div className="mb-2">
                   <IconePraga 
@@ -67,7 +64,7 @@ const DetalheMes = ({ mes }: DetalheMesProps) => {
                   />
                 </div>
                 <p className="text-sm font-medium text-center">{item.praga.nome}</p>
-                <Badge className={cn("mt-2", item.incidenciaAlta ? "bg-red-500" : "bg-gray-500")}>
+                <Badge className={cn("mt-1", item.incidenciaAlta ? "bg-red-500" : "bg-gray-500")}>
                   {item.incidenciaAlta ? "Alta Incidência" : "Incidência Média"}
                 </Badge>
               </div>

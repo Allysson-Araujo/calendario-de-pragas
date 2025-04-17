@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Praga } from "@/data/pragas";
 import {
@@ -85,11 +84,6 @@ const IconePraga = ({
     }
   };
 
-  const tooltipText = incidenciaAlta
-    ? `${praga.nome} - Alta incidência`
-    : `${praga.nome} - Incidência média`;
-
-  // Se estiver em modo de edição, permite ações adicionais
   if (editMode) {
     return (
       <>
@@ -143,7 +137,6 @@ const IconePraga = ({
           </div>
         </div>
 
-        {/* Dialog para editar ícone */}
         <Dialog open={showDialog} onOpenChange={setShowDialog}>
           <DialogContent>
             <DialogHeader>
@@ -168,7 +161,6 @@ const IconePraga = ({
           </DialogContent>
         </Dialog>
 
-        {/* Dialog para upload de imagem */}
         <Dialog open={showImageUpload} onOpenChange={setShowImageUpload}>
           <DialogContent>
             <DialogHeader>
@@ -187,7 +179,6 @@ const IconePraga = ({
           </DialogContent>
         </Dialog>
 
-        {/* Dialog para input de URL de imagem */}
         <Dialog open={showImageUrlInput} onOpenChange={setShowImageUrlInput}>
           <DialogContent>
             <DialogHeader>
@@ -233,19 +224,28 @@ const IconePraga = ({
         <TooltipTrigger>
           <div className="relative">
             <div
-              className={cn(
-                "w-10 h-10 flex items-center justify-center",
-                incidenciaAlta ? "praga-alta" : "praga-media"
-              )}
+              className="flex items-center justify-center"
+              style={{
+                width: '40px', 
+                height: '40px',
+                filter: incidenciaAlta ? 'drop-shadow(0 0 2px #ea384c)' : 'none'
+              }}
             >
               {praga.imagemUrl ? (
                 <img
                   src={praga.imagemUrl}
                   alt={praga.nome}
                   className="w-8 h-8 object-contain"
+                  style={{ 
+                    filter: incidenciaAlta ? 'hue-rotate(-10deg) saturate(1.5)' : 'none'
+                  }}
                 />
               ) : (
-                <span className="text-xl">{praga.icone}</span>
+                <span className="text-xl" style={{ 
+                  color: incidenciaAlta ? '#ea384c' : 'inherit'
+                }}>
+                  {praga.icone}
+                </span>
               )}
             </div>
             
@@ -263,7 +263,7 @@ const IconePraga = ({
           </div>
         </TooltipTrigger>
         <TooltipContent>
-          <p>{tooltipText}</p>
+          <p>{praga.nome} {incidenciaAlta ? '- Alta incidência' : '- Incidência média'}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

@@ -1,9 +1,12 @@
 
-import { incidencias, pragas, estacoes } from "@/data/pragas";
+import { incidencias, estacoes } from "@/data/pragas";
 import { cn } from "@/lib/utils";
 import IconePraga from "./IconePraga";
+import { usePragas } from "@/contexts/PragasContext";
 
 const Legenda = () => {
+  const { pragas } = usePragas();
+  
   return (
     <div className="mt-6 p-4 bg-gray-100 rounded-md">
       <h3 className="text-center font-bold mb-4">LEGENDA:</h3>
