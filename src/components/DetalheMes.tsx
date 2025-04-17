@@ -25,7 +25,7 @@ const nomeEstacao: Record<string, string> = {
 };
 
 const DetalheMes = ({ mes }: DetalheMesProps) => {
-  const { pragas, calendario } = usePragas();
+  const { pragas } = usePragas();
   
   // Encontrar as pragas para este mês
   const pragasDoMes = mes.pragas.map((item) => {

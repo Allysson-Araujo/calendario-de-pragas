@@ -7,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 
 const IconEditor = () => {
-  const { pragas, atualizarPraga, excluirPraga, atualizarIncidencia } = usePragas();
+  const { pragas, atualizarPraga, excluirPraga } = usePragas();
   const [editMode, setEditMode] = useState(false);
   
   const handleIconUpdate = (pragaId: string, novoIcone: string) => {
@@ -61,11 +61,8 @@ const IconEditor = () => {
   };
 
   const handleIncidenciaChange = (pragaId: string, incidenciaAlta: boolean) => {
-    const praga = pragas.find(p => p.id === pragaId);
-    if (praga) {
-      atualizarPraga(pragaId, { incidenciaAlta });
-      toast.success(`Incidência atualizada para ${incidenciaAlta ? 'alta' : 'média'}`);
-    }
+    atualizarPraga(pragaId, { incidenciaAlta });
+    toast.success(`Incidência atualizada para ${incidenciaAlta ? 'alta' : 'média'}`);
   };
 
   return (

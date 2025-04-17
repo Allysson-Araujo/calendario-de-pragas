@@ -3,6 +3,7 @@ export interface Praga {
   nome: string;
   icone: string;
   imagemUrl?: string;
+  incidenciaAlta?: boolean;
 }
 
 export interface IncidenciaPraga {
