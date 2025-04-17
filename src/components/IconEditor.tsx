@@ -1,12 +1,13 @@
-
 import { useState } from "react";
 import IconePraga from "./IconePraga";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { usePragas } from "@/contexts/PragasContext";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 
 const IconEditor = () => {
-  const { pragas, atualizarPraga, excluirPraga } = usePragas();
+  const { pragas, atualizarPraga, excluirPraga, atualizarIncidencia } = usePragas();
   const [editMode, setEditMode] = useState(false);
   
   const handleIconUpdate = (pragaId: string, novoIcone: string) => {
@@ -54,9 +55,17 @@ const IconEditor = () => {
     reader.readAsDataURL(imageFile);
   };
 
-  const handleDeletePraga = (pragaId: string) => {
+  const handleDelete = (pragaId: string) => {
     excluirPraga(pragaId);
     toast.success("Praga excluída com sucesso");
+  };
+
+  const handleIncidenciaChange = (pragaId: string, incidenciaAlta: boolean) => {
+    const praga = pragas.find(p => p.id === pragaId);
+    if (praga) {
+      atualizarPraga(pragaId, { incidenciaAlta });
+      toast.success(`Incidência atualizada para ${incidenciaAlta ? 'alta' : 'média'}`);
+    }
   };
 
   return (
@@ -71,18 +80,35 @@ const IconEditor = () => {
         </Button>
       </div>
       
-      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
         {pragas.map(praga => (
-          <div key={praga.id} className="flex flex-col items-center">
+          <div key={praga.id} className="flex flex-col items-center space-y-2">
             <IconePraga 
               praga={praga} 
-              incidenciaAlta={false} 
+              incidenciaAlta={praga.incidenciaAlta || false}
               onIconUpdate={handleIconUpdate}
               onImageUpdate={handleImageUpdate}
-              onDelete={handleDeletePraga}
+              onDelete={handleDelete}
               editMode={editMode}
             />
             <span className="text-xs mt-1">{praga.nome}</span>
+            
+            {editMode && (
+              <RadioGroup
+                defaultValue={praga.incidenciaAlta ? "alta" : "media"}
+                onValueChange={(value) => handleIncidenciaChange(praga.id, value === "alta")}
+                className="flex gap-4"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="alta" id={`alta-${praga.id}`} />
+                  <Label htmlFor={`alta-${praga.id}`} className="text-xs">Alta</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="media" id={`media-${praga.id}`} />
+                  <Label htmlFor={`media-${praga.id}`} className="text-xs">Média</Label>
+                </div>
+              </RadioGroup>
+            )}
           </div>
         ))}
       </div>
