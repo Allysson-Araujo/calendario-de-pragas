@@ -9,48 +9,7 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      calendario: {
-        Row: {
-          estacao: string
-          id: number
-          mes: string
-          pragas: Json
-        }
-        Insert: {
-          estacao: string
-          id?: number
-          mes: string
-          pragas?: Json
-        }
-        Update: {
-          estacao?: string
-          id?: number
-          mes?: string
-          pragas?: Json
-        }
-        Relationships: []
-      }
-      pragas: {
-        Row: {
-          icone: string
-          id: string
-          imagem_url: string | null
-          nome: string
-        }
-        Insert: {
-          icone: string
-          id: string
-          imagem_url?: string | null
-          nome: string
-        }
-        Update: {
-          icone?: string
-          id?: string
-          imagem_url?: string | null
-          nome?: string
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never
