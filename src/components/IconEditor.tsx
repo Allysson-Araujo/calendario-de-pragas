@@ -1,10 +1,9 @@
+
 import { useState } from "react";
 import IconePraga from "./IconePraga";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { usePragas } from "@/contexts/PragasContext";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 
 const IconEditor = () => {
   const { pragas, atualizarPraga, excluirPraga } = usePragas();
@@ -16,35 +15,25 @@ const IconEditor = () => {
   };
   
   const handleImageUpdate = (pragaId: string, imageFile: File) => {
-    // Verificar o tamanho do arquivo (opcional)
-    if (imageFile.size > 5 * 1024 * 1024) { // 5MB limite
+    if (imageFile.size > 5 * 1024 * 1024) {
       toast.error("Imagem muito grande. Máximo de 5MB permitido.");
       return;
     }
     
-    // Criar um objeto URL para a imagem
     const reader = new FileReader();
     
     reader.onload = (e) => {
-      // Criar um elemento de imagem para verificar as dimensões
       const img = new Image();
       img.onload = () => {
-        // Redimensionar para 150x150 usando canvas
         const canvas = document.createElement("canvas");
         canvas.width = 150;
         canvas.height = 150;
         const ctx = canvas.getContext("2d");
         
         if (ctx) {
-          // Desenhar a imagem redimensionada
           ctx.drawImage(img, 0, 0, 150, 150);
-          
-          // Converter para URL de dados
           const resizedImageUrl = canvas.toDataURL("image/png");
-          
-          // Atualizar o estado
           atualizarPraga(pragaId, { imagemUrl: resizedImageUrl });
-          
           toast.success("Imagem carregada com sucesso");
         }
       };
@@ -58,11 +47,6 @@ const IconEditor = () => {
   const handleDelete = (pragaId: string) => {
     excluirPraga(pragaId);
     toast.success("Praga excluída com sucesso");
-  };
-
-  const handleIncidenciaChange = (pragaId: string, incidenciaAlta: boolean) => {
-    atualizarPraga(pragaId, { incidenciaAlta });
-    toast.success(`Incidência atualizada para ${incidenciaAlta ? 'alta' : 'média'}`);
   };
 
   return (
@@ -81,31 +65,14 @@ const IconEditor = () => {
         {pragas.map(praga => (
           <div key={praga.id} className="flex flex-col items-center space-y-2">
             <IconePraga 
-              praga={praga} 
-              incidenciaAlta={praga.incidenciaAlta || false}
+              praga={praga}
+              incidenciaAlta={false}
               onIconUpdate={handleIconUpdate}
               onImageUpdate={handleImageUpdate}
               onDelete={handleDelete}
               editMode={editMode}
             />
             <span className="text-xs mt-1">{praga.nome}</span>
-            
-            {editMode && (
-              <RadioGroup
-                defaultValue={praga.incidenciaAlta ? "alta" : "media"}
-                onValueChange={(value) => handleIncidenciaChange(praga.id, value === "alta")}
-                className="flex gap-4"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="alta" id={`alta-${praga.id}`} />
-                  <Label htmlFor={`alta-${praga.id}`} className="text-xs">Alta</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="media" id={`media-${praga.id}`} />
-                  <Label htmlFor={`media-${praga.id}`} className="text-xs">Média</Label>
-                </div>
-              </RadioGroup>
-            )}
           </div>
         ))}
       </div>
